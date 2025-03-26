@@ -1,3 +1,4 @@
+/* Ensure Tailwind directives are correctly placed */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
