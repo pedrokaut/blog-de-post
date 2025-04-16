@@ -4,19 +4,23 @@ import axios from "axios";
 import Link from "next/link";
 import classNames from "classnames";
 
-
 interface Post {
   id: number;
   title: string;
-  content: string;
+  body: string; // Alterado de 'content' para 'body' conforme a API JSONPlaceholder
+  userId: number; // Campo adicional da API
 }
 
 export default function Posts() {
   const [posts, setPosts] = useState<Post[]>([]);
 
   const fetchRecords = async () => {
-    const response = await axios.get<Post[]>("http://localhost:3001/posts");
-    setPosts(response.data);
+    try {
+      const response = await axios.get<Post[]>("https://jsonplaceholder.typicode.com/posts");
+      setPosts(response.data);
+    } catch (error) {
+      console.error("Erro ao buscar posts:", error);
+    }
   };
 
   useEffect(() => {
@@ -24,9 +28,13 @@ export default function Posts() {
   }, []);
 
   const handleDelete = async (id: number) => {
-    await axios.delete(`http://localhost:3001/posts/${id}`);
-    const filteredData = posts.filter((post) => post.id !== id);
-    setPosts(filteredData);
+    try {
+      await axios.delete(`https://jsonplaceholder.typicode.com/posts/${id}`);
+      const filteredData = posts.filter((post) => post.id !== id);
+      setPosts(filteredData);
+    } catch (error) {
+      console.error("Erro ao deletar post:", error);
+    }
   };
 
   return (
@@ -53,7 +61,7 @@ export default function Posts() {
         <thead className={classNames("bg-gray-100")}>
           <tr>
             <th className={classNames("px-4", "py-2", "border", "border-gray-300")}>ID</th>
-            <th className={classNames("px-4", "py-2", "border", "border-gray-300")}>Titulo</th>
+            <th className={classNames("px-4", "py-2", "border", "border-gray-300")}>Título</th>
             <th className={classNames("px-4", "py-2", "border", "border-gray-300")}>Mensagem</th>
             <th className={classNames("px-4", "py-2", "border", "border-gray-300")}>Ações</th>
           </tr>
@@ -63,7 +71,7 @@ export default function Posts() {
             <tr key={post.id} className={classNames("hover:bg-gray-50")}>
               <td className={classNames("px-4", "py-2", "border", "border-gray-300")}>{post.id}</td>
               <td className={classNames("px-4", "py-2", "border", "border-gray-300")}>{post.title}</td>
-              <td className={classNames("px-4", "py-2", "border", "border-gray-300")}>{post.content}</td>
+              <td className={classNames("px-4", "py-2", "border", "border-gray-300")}>{post.body}</td>
               <td className={classNames("px-4", "py-2", "border", "border-gray-300")}>
                 <Link href={`/posts/${post.id}?mode=read`} passHref>
                   <button className={classNames("px-3", "py-1", "bg-blue-500", "rounded", "text-white", "mr-2", "hover:bg-blue-600")}>

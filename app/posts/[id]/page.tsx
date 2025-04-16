@@ -5,24 +5,25 @@ import axios from "axios";
 import { useRouter, useSearchParams, useParams } from "next/navigation";
 
 interface Post {
-  id: string;
+  id: number;
   title: string;
-  content: string;
+  body: string; // Alterado de 'content' para 'body' conforme a API JSONPlaceholder
+  userId: number; // Campo adicional da API
 }
 
 export default function PostDetails() {
-  const params = useParams(); 
+  const params = useParams();
   const searchQuery = useSearchParams();
   const mode = searchQuery.get("mode");
 
   const [post, setPost] = useState<Post | null>(null);
   const [editing, setEditing] = useState<boolean>(mode === "edit");
   const [title, setTitle] = useState<string>("");
-  const [content, setContent] = useState<string>("");
+  const [body, setBody] = useState<string>(""); // Alterado de 'content' para 'body'
   const router = useRouter();
 
   useEffect(() => {
-    if (params.id) { 
+    if (params.id) {
       fetchPost();
     }
   }, [params.id]);
@@ -33,10 +34,10 @@ export default function PostDetails() {
 
   const fetchPost = async () => {
     try {
-      const response = await axios.get(`http://localhost:3001/posts/${params.id}`);
+      const response = await axios.get(`https://jsonplaceholder.typicode.com/posts/${params.id}`);
       setPost(response.data);
       setTitle(response.data.title);
-      setContent(response.data.content);
+      setBody(response.data.body); // Alterado de 'content' para 'body'
     } catch (error) {
       console.error("Erro ao buscar o post:", error);
     }
@@ -45,7 +46,7 @@ export default function PostDetails() {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     try {
-      await axios.put(`http://localhost:3001/posts/${params.id}`, { title, content });
+      await axios.put(`https://jsonplaceholder.typicode.com/posts/${params.id}`, { title, body });
       setEditing(false);
       fetchPost();
     } catch (error) {
@@ -55,7 +56,7 @@ export default function PostDetails() {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`http://localhost:3001/posts/${params.id}`);
+      await axios.delete(`https://jsonplaceholder.typicode.com/posts/${params.id}`);
       router.push("/");
     } catch (error) {
       console.error("Erro ao deletar post:", error);
@@ -72,15 +73,15 @@ export default function PostDetails() {
                 <input
                   className="edit-input"
                   type="text"
-                  placeholder="Title"
+                  placeholder="Título"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                 />
                 <textarea
                   className="edit-textarea"
-                  placeholder="Enter content here"
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
+                  placeholder="Digite o conteúdo aqui"
+                  value={body} // Alterado de 'content' para 'body'
+                  onChange={(e) => setBody(e.target.value)}
                 />
                 <button type="submit" className="save-button">
                   Salvar
@@ -89,14 +90,14 @@ export default function PostDetails() {
             ) : (
               <div className="view-content">
                 <h3>{post.title}</h3>
-                <p>{post.content}</p>
+                <p>{post.body}</p> {/* Alterado de 'content' para 'body' */}
               </div>
             )}
           </div>
         )}
         <div className="action-buttons">
           <button className="home-button" onClick={() => router.push("/")}>
-            Inicio
+            Início
           </button>
           <button className="edit-button" onClick={() => setEditing(!editing)}>
             Editar
