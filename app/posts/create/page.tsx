@@ -15,14 +15,14 @@ export default function CreatePost() {
     setError(null);
 
     try {
-      // Buscar posts existentes do json-server para determinar o próximo ID
+      
       const localResponse = await axios.get("http://localhost:3001/posts");
       const localPosts = localResponse.data;
-      // Encontrar o maior ID ou usar 100 como base (para IDs > 100)
+      
       const maxId = localPosts.length > 0 ? Math.max(...localPosts.map((post: any) => post.id)) : 100;
       const nextId = maxId + 1;
 
-      // Criar novo post com o ID sequencial
+      
       const response = await axios.post("http://localhost:3001/posts", {
         id: nextId,
         title,
