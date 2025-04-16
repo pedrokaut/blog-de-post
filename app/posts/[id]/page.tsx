@@ -7,8 +7,8 @@ import { useRouter, useSearchParams, useParams } from "next/navigation";
 interface Post {
   id: number;
   title: string;
-  body: string; // Alterado de 'content' para 'body' conforme a API JSONPlaceholder
-  userId: number; // Campo adicional da API
+  body: string;
+  userId: number;
 }
 
 export default function PostDetails() {
@@ -19,7 +19,7 @@ export default function PostDetails() {
   const [post, setPost] = useState<Post | null>(null);
   const [editing, setEditing] = useState<boolean>(mode === "edit");
   const [title, setTitle] = useState<string>("");
-  const [body, setBody] = useState<string>(""); // Alterado de 'content' para 'body'
+  const [body, setBody] = useState<string>("");
   const router = useRouter();
 
   useEffect(() => {
@@ -34,10 +34,29 @@ export default function PostDetails() {
 
   const fetchPost = async () => {
     try {
-      const response = await axios.get(`https://jsonplaceholder.typicode.com/posts/${params.id}`);
-      setPost(response.data);
-      setTitle(response.data.title);
-      setBody(response.data.body); // Alterado de 'content' para 'body'
+      const id = Number(params.id);
+      
+      if (id > 100) {
+        try {
+          const response = await axios.get(`http://localhost:3001/posts/${id}`);
+          setPost(response.data);
+          setTitle(response.data.title);
+          setBody(response.data.body);
+        } catch (error) {
+          console.error("Post local não encontrado, buscando na API pública:", error);
+          // Fallback para API pública se o post local não existir
+          const response = await axios.get(`https://jsonplaceholder.typicode.com/posts/${id}`);
+          setPost(response.data);
+          setTitle(response.data.title);
+          setBody(response.data.body);
+        }
+      } else {
+        
+        const response = await axios.get(`https://jsonplaceholder.typicode.com/posts/${id}`);
+        setPost(response.data);
+        setTitle(response.data.title);
+        setBody(response.data.body);
+      }
     } catch (error) {
       console.error("Erro ao buscar o post:", error);
     }
@@ -46,7 +65,9 @@ export default function PostDetails() {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     try {
-      await axios.put(`https://jsonplaceholder.typicode.com/posts/${params.id}`, { title, body });
+      const id = Number(params.id);
+    
+      await axios.put(`http://localhost:3001/posts/${id}`, { id, title, body, userId: 1 });
       setEditing(false);
       fetchPost();
     } catch (error) {
@@ -56,7 +77,14 @@ export default function PostDetails() {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`https://jsonplaceholder.typicode.com/posts/${params.id}`);
+      const id = Number(params.id);
+      
+      if (id > 100) {
+        await axios.delete(`http://localhost:3001/posts/${id}`);
+      } else {
+        
+        await axios.delete(`https://jsonplaceholder.typicode.com/posts/${id}`);
+      }
       router.push("/");
     } catch (error) {
       console.error("Erro ao deletar post:", error);
@@ -80,7 +108,7 @@ export default function PostDetails() {
                 <textarea
                   className="edit-textarea"
                   placeholder="Digite o conteúdo aqui"
-                  value={body} // Alterado de 'content' para 'body'
+                  value={body}
                   onChange={(e) => setBody(e.target.value)}
                 />
                 <button type="submit" className="save-button">
@@ -90,7 +118,7 @@ export default function PostDetails() {
             ) : (
               <div className="view-content">
                 <h3>{post.title}</h3>
-                <p>{post.body}</p> {/* Alterado de 'content' para 'body' */}
+                <p>{post.body}</p>
               </div>
             )}
           </div>

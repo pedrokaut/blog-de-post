@@ -6,19 +6,28 @@ import { useRouter } from "next/navigation";
 
 export default function CreatePost() {
   const [title, setTitle] = useState<string>("");
-  const [body, setBody] = useState<string>(""); // Alterado de 'content' para 'body'
+  const [body, setBody] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    setError(null); // Limpa erros anteriores
+    setError(null);
 
     try {
-      const response = await axios.post("https://jsonplaceholder.typicode.com/posts", {
+      // Buscar posts existentes do json-server para determinar o próximo ID
+      const localResponse = await axios.get("http://localhost:3001/posts");
+      const localPosts = localResponse.data;
+      // Encontrar o maior ID ou usar 100 como base (para IDs > 100)
+      const maxId = localPosts.length > 0 ? Math.max(...localPosts.map((post: any) => post.id)) : 100;
+      const nextId = maxId + 1;
+
+      // Criar novo post com o ID sequencial
+      const response = await axios.post("http://localhost:3001/posts", {
+        id: nextId,
         title,
         body,
-        userId: 1, // JSONPlaceholder exige userId, usando 1 como padrão
+        userId: 1,
       });
       if (response.status === 201) {
         alert("Post criado com sucesso!");
@@ -27,13 +36,10 @@ export default function CreatePost() {
     } catch (error: any) {
       console.error("Erro ao criar post:", error);
       if (error.response) {
-        // O servidor respondeu com um status fora do intervalo 2xx
         setError(`Erro do servidor: ${error.response.status} - ${error.response.data}`);
       } else if (error.request) {
-        // A requisição foi feita, mas não houve resposta (Network Error)
-        setError("Erro de rede: Não foi possível conectar ao servidor. Verifique sua conexão.");
+        setError("Erro de rede: Não foi possível conectar ao json-server. Verifique se está rodando em http://localhost:3001.");
       } else {
-        // Outro erro durante a configuração da requisição
         setError(`Erro: ${error.message}`);
       }
     }

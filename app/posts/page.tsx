@@ -7,8 +7,8 @@ import classNames from "classnames";
 interface Post {
   id: number;
   title: string;
-  body: string; // Alterado de 'content' para 'body' conforme a API JSONPlaceholder
-  userId: number; // Campo adicional da API
+  body: string;
+  userId: number;
 }
 
 export default function Posts() {
@@ -16,8 +16,12 @@ export default function Posts() {
 
   const fetchRecords = async () => {
     try {
-      const response = await axios.get<Post[]>("https://jsonplaceholder.typicode.com/posts");
-      setPosts(response.data);
+      
+      const apiResponse = await axios.get<Post[]>("https://jsonplaceholder.typicode.com/posts");
+      
+      const localResponse = await axios.get<Post[]>("http://localhost:3001/posts");
+      
+      setPosts([...apiResponse.data, ...localResponse.data]);
     } catch (error) {
       console.error("Erro ao buscar posts:", error);
     }
@@ -29,7 +33,16 @@ export default function Posts() {
 
   const handleDelete = async (id: number) => {
     try {
-      await axios.delete(`https://jsonplaceholder.typicode.com/posts/${id}`);
+      
+      const isLocalPost = id > 100;
+      if (isLocalPost) {
+        
+        await axios.delete(`http://localhost:3001/posts/${id}`);
+      } else {
+        
+        await axios.delete(`https://jsonplaceholder.typicode.com/posts/${id}`);
+      }
+      
       const filteredData = posts.filter((post) => post.id !== id);
       setPosts(filteredData);
     } catch (error) {
