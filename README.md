@@ -2,7 +2,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 ## npm install para poder rodar
-## npm run server caso esteja usando a db.json
+## npm run server caso esteja usando servidor JSON simulado (db.json)
 First, run the development server:
 
 ```bash
