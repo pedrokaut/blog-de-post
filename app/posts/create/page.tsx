@@ -3,12 +3,12 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 
-const Create = () => {
-    const [title, setTitle] = useState('');
-    const [content, setContent] = useState('');
+const Create: React.FC = () => {
+    const [title, setTitle] = useState<string>('');
+    const [content, setContent] = useState<string>('');
     const router = useRouter();
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         try {

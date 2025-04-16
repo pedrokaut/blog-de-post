@@ -2,13 +2,18 @@
   "posts": [
     {
       "id": "5fa5",
-      "title": "segundo",
-      "content": "esse e o segundo post"
+      "title": "aprendendo ",
+      "content": "testei hoje e foi bem de boa"
     },
     {
-      "title": "quarto4",
-      "content": "esse e o aaquarto post",
-      "id": "2e8e"
+      "id": "2e8e",
+      "title": "axios é útil",
+      "content": "fiz umas requisições com axios e curti, bem direto"
+    },
+    {
+      "id": "449d",
+      "title": "tailwind facilita",
+      "content": "mexer com tailwind deixa o layout mais rápido de fazer"
     }
   ]
 }
